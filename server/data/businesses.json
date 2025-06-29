@@ -1,0 +1,32 @@
+[
+  {
+    "id": "biz_1751181027898_af5bv3lqq",
+    "name": "My Business",
+    "description": "Default business configuration",
+    "createdAt": "2025-06-29T07:10:27.898Z",
+    "updatedAt": "2025-06-29T07:10:27.904Z",
+    "bigcommerce": {
+      "storeHash": "",
+      "accessToken": "",
+      "enabled": false
+    },
+    "google": {
+      "clientId": "",
+      "clientSecret": "",
+      "accessToken": "",
+      "refreshToken": "",
+      "enabled": false
+    },
+    "meta": {
+      "appId": "",
+      "appSecret": "",
+      "accessToken": "",
+      "enabled": false
+    },
+    "settings": {
+      "timezone": "UTC",
+      "currency": "USD",
+      "dateFormat": "MM/DD/YYYY"
+    }
+  }
+]
