@@ -77,7 +77,10 @@ const Dashboard = () => {
   const [showApiConfigModal, setShowApiConfigModal] = useState(false);
 
   useEffect(() => {
-    if (selectedBusinessId) {
+    // Initialize with first business if none selected
+    if (!selectedBusinessId) {
+      initializeBusiness();
+    } else {
       loadDashboardData();
       loadSystemStatus();
     }
@@ -91,6 +94,18 @@ const Dashboard = () => {
 
     return () => clearInterval(interval);
   }, [selectedPeriod, selectedBusinessId]);
+
+  const initializeBusiness = async () => {
+    try {
+      const businesses = await ApiService.getBusinesses() as any[];
+      if (businesses && businesses.length > 0) {
+        setSelectedBusinessId(businesses[0].id);
+      }
+    } catch (error) {
+      console.error('Error initializing business:', error);
+      setError('Failed to load business configuration');
+    }
+  };
 
   const loadDashboardData = async () => {
     if (!selectedBusinessId) return;
