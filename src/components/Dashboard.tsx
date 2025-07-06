@@ -16,7 +16,8 @@ import {
   Wifi,
   WifiOff,
   LucideIcon,
-  Settings
+  Settings,
+  Download
 } from 'lucide-react';
 import MetricCard from './MetricCard';
 import Chart from './Chart';
@@ -244,6 +245,49 @@ const Dashboard = () => {
     console.log('Manage businesses clicked');
   };
 
+  const handleExportReport = () => {
+    if (!selectedBusinessId) {
+      setError('Please select a business to export report');
+      return;
+    }
+
+    try {
+      // Create report data
+      const reportData = {
+        businessId: selectedBusinessId,
+        period: selectedPeriod,
+        timestamp: new Date().toISOString(),
+        metrics: metrics,
+        platforms: platforms,
+        chartData: chartData,
+        systemStatus: systemStatus
+      };
+
+      // Convert to JSON and create downloadable file
+      const dataStr = JSON.stringify(reportData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      
+      // Create download link
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `marketing-report-${selectedPeriod}-${new Date().toISOString().split('T')[0]}.json`;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      // Show success message
+      setError(null);
+      console.log('Report exported successfully');
+    } catch (error) {
+      console.error('Error exporting report:', error);
+      setError('Failed to export report');
+    }
+  };
+
   const getPlatformIcon = (platformName: string): LucideIcon => {
     switch (platformName.toLowerCase()) {
       case 'bigcommerce':
@@ -448,9 +492,12 @@ const Dashboard = () => {
                 <span>Configure APIs</span>
               </button>
               
-              <button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105">
-                <Calendar className="h-4 w-4 inline mr-2" />
-                Export Report
+              <button 
+                onClick={handleExportReport}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105 flex items-center space-x-2"
+              >
+                <Download className="h-4 w-4" />
+                <span>Export Report</span>
               </button>
             </div>
           </div>
