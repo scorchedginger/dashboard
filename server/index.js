@@ -12,11 +12,17 @@ import { businessRoutes } from './routes/businesses.js';
 import { DataAggregator } from './services/dataAggregator.js';
 import { CacheManager } from './services/cacheManager.js';
 import { BusinessManager } from './services/businessManager.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Initialize services
 const cacheManager = new CacheManager();
@@ -26,6 +32,9 @@ const businessManager = new BusinessManager();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from the dist directory
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // Make services available to routes
 app.use((req, res, next) => {
@@ -57,6 +66,11 @@ app.get('/api/health', (req, res) => {
     },
     businesses: businessManager.businesses.size
   });
+});
+
+// Serve React app for all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 // Schedule data refresh every 15 minutes
