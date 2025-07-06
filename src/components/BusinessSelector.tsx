@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, Plus, Settings, Building2 } from 'lucide-react';
+import { ApiService } from '../services/apiService';
 
 interface Business {
   id: string;
@@ -67,11 +68,8 @@ const BusinessSelector: React.FC<BusinessSelectorProps> = ({
   const loadBusinesses = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/businesses');
-      if (response.ok) {
-        const data = await response.json();
-        setBusinesses(data);
-      }
+      const data = await ApiService.getBusinesses() as Business[];
+      setBusinesses(data);
     } catch (error) {
       console.error('Error loading businesses:', error);
     } finally {
