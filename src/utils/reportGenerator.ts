@@ -165,7 +165,7 @@ export class ReportGenerator {
     });
   }
 
-  private static async addChartsSection(doc: jsPDF, chartData: any, margin: number, startY: number): Promise<void> {
+    private static async addChartsSection(doc: jsPDF, chartData: any, margin: number, startY: number): Promise<void> {
     doc.setFontSize(16);
     doc.setTextColor(75, 0, 130);
     doc.text('Revenue Trends', margin, startY);
@@ -183,8 +183,27 @@ export class ReportGenerator {
       doc.setDrawColor(200, 200, 200);
       doc.rect(chartX, chartY, chartWidth, chartHeight);
       
-             // Find max value for scaling
-       const maxValue = Math.max(...chartData.revenue.map((item: any) => item.value || 0));
+      // Draw X-axis line
+      doc.setDrawColor(150, 150, 150);
+      doc.setLineWidth(1);
+      doc.line(chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight);
+      
+      // Draw Y-axis line
+      doc.line(chartX, chartY, chartX, chartY + chartHeight);
+      
+      // Find max value for scaling
+      const maxValue = Math.max(...chartData.revenue.map((item: any) => item.value || 0));
+      
+      // Draw Y-axis labels
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      const ySteps = 4;
+      for (let i = 0; i <= ySteps; i++) {
+        const yValue = (maxValue / ySteps) * i;
+        const yPos = chartY + chartHeight - (i * chartHeight / ySteps);
+        doc.text(`$${yValue.toFixed(0)}`, chartX - 5, yPos + 2);
+        doc.line(chartX - 2, yPos, chartX, yPos);
+      }
       
       // Draw chart bars
       const barWidth = chartWidth / chartData.revenue.length;
@@ -196,10 +215,10 @@ export class ReportGenerator {
         doc.setFillColor(75, 0, 130);
         doc.rect(barX, barY, barWidth - 4, barHeight, 'F');
         
-        // Add labels
+        // Add X-axis labels
         doc.setFontSize(8);
         doc.setTextColor(100, 100, 100);
-        doc.text(item.name, barX, chartY + chartHeight + 5);
+        doc.text(item.name, barX + (barWidth / 2) - 5, chartY + chartHeight + 8);
       });
     }
   }
