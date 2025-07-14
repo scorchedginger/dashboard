@@ -25,6 +25,7 @@ import PlatformCard from './PlatformCard';
 import BusinessSelector from './BusinessSelector';
 import ApiConfigModal from './ApiConfigModal';
 import { ApiService } from '../services/apiService';
+import { ReportGenerator } from '../utils/reportGenerator';
 
 interface Metric {
   title: string;
@@ -245,7 +246,7 @@ const Dashboard = () => {
     console.log('Manage businesses clicked');
   };
 
-  const handleExportReport = () => {
+  const handleExportReport = async () => {
     if (!selectedBusinessId) {
       setError('Please select a business to export report');
       return;
@@ -263,25 +264,12 @@ const Dashboard = () => {
         systemStatus: systemStatus
       };
 
-      // Convert to JSON and create downloadable file
-      const dataStr = JSON.stringify(reportData, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      
-      // Create download link
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `marketing-report-${selectedPeriod}-${new Date().toISOString().split('T')[0]}.json`;
-      
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // Generate PDF report
+      await ReportGenerator.generatePDFReport(reportData);
 
       // Show success message
       setError(null);
-      console.log('Report exported successfully');
+      console.log('PDF report exported successfully');
     } catch (error) {
       console.error('Error exporting report:', error);
       setError('Failed to export report');
